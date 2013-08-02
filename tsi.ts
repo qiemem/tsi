@@ -2,8 +2,23 @@
 
 import readline = module("readline");
 import vm = module("vm");
+
 var typescript = require("typescript.api");
-var argv = require('optimist').argv;
+var options = require('optimist')
+    .usage('A simple typescript REPL.\nUsage: $0')
+    .alias('h', 'help')
+    .describe('h', 'Print this help message')
+    .alias('f', 'force')
+    .describe('f', 'Force tsi to evaluate code with typescript errors.')
+    .alias('v', 'verbose')
+    .describe('v', 'Print compiled javascript before evaluating.'),
+    argv = options.argv;
+
+if (argv.h) {
+  options.showHelp();
+  process.exit(1);
+}
+
 
 var rl = readline.createInterface({
   input: process.stdin,
@@ -13,9 +28,10 @@ var rl = readline.createInterface({
 var defaultPrompt = '>>> ',
 	moreLinesPrompt = '... ',
     context = {},
-    verbose = argv.v || argv.verbose,
+    verbose = argv.v,
+    force = argv.f,
 	sourceUnits = [],
-	sourceNumber = 0;;
+    sourceNumber = 0;
 
 function repl(prompt: string, prefix: string) {
   rl.question(prompt, function(code) {
