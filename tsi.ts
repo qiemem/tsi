@@ -13,7 +13,9 @@ var rl = readline.createInterface({
 var defaultPrompt = '>>> ',
 	moreLinesPrompt = '... ',
     context = {},
-    verbose = argv.v || argv.verbose;
+    verbose = argv.v || argv.verbose,
+	sourceUnits = [],
+	sourceNumber = 0;;
 
 function repl(prompt: string, prefix: string) {
   rl.question(prompt, function(code) {
@@ -23,16 +25,18 @@ function repl(prompt: string, prefix: string) {
         openParen = (code.match(/\(/g) || []).length,
         closeParen = (code.match(/\)/g) || []).length;
     if (openCurly === closeCurly && openParen === closeParen) {
-      var source = typescript.create('temp.ts', code);
-      typescript.compile([source], function (compiled) {
+	  sourceNumber++;
+      sourceUnits.push(typescript.create(sourceNumber + '.ts', code));
+      typescript.compile(sourceUnits, function (compiled) {
+		var current = compiled[sourceUnits.length - 1];
         if (verbose) {
-          console.log(compiled[0].content);
+          console.log(current.content);
         }
-        for (var i = 0; i < compiled[0].diagnostics.length; i++) {
-          console.log(compiled[0].diagnostics[i].message);
+        for (var i = 0; i < current.diagnostics.length; i++) {
+          console.log(current.diagnostics[i].message);
         }
         try {
-          console.log(vm.runInNewContext(compiled[0].content, context));
+          console.log(vm.runInNewContext(current.content, context));
         } catch (e) {
           console.log(e.stack);
         }
