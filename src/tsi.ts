@@ -1,4 +1,4 @@
-/// <reference path="node.d.ts" />
+/// <reference path="../lib/node.d.ts" />
 
 import readline = module("readline");
 import vm = module("vm");
@@ -51,10 +51,12 @@ function repl(prompt: string, prefix: string) {
         for (var i = 0; i < current.diagnostics.length; i++) {
           console.log(current.diagnostics[i].message);
         }
-        try {
-          console.log(vm.runInNewContext(current.content, context));
-        } catch (e) {
-          console.log(e.stack);
+        if (force || current.diagnostics.length === 0) {
+          try {
+            console.log(vm.runInNewContext(current.content, context));
+          } catch (e) {
+            console.log(e.stack);
+          }
         }
         repl(defaultPrompt, '');
       });
