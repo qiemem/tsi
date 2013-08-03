@@ -1,12 +1,13 @@
 tsi
 ---
-A simple typescript REPL.
-Usage: tsi
 
-Options:
-  -h, --help     Print this help message                           
-  -f, --force    Force tsi to evaluate code with typescript errors.
-  -v, --verbose  Print compiled javascript before evaluating.      
+    A simple typescript REPL.
+    Usage: tsi
+
+    Options:
+      -h, --help     Print this help message                           
+      -f, --force    Force tsi to evaluate code with typescript errors.
+      -v, --verbose  Print compiled javascript before evaluating.      
 
 ### Example:
 
