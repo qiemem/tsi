@@ -1,13 +1,15 @@
 {
   "name": "tsi",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A typescript REPL (command line interpreter)",
   "main": "tsi.js",
   "dependencies": {
     "typescript.api": "~0.6.1",
     "optimist": "~0.6.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "typescript": "0.9.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc --module Node --out bin src/tsi.ts"
@@ -23,6 +25,7 @@
   "keywords": [
     "typescript",
     "repl",
+    "command line",
     "interpreter"
   ],
   "author": "Bryan Head",
