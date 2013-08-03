@@ -13,7 +13,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc --module Node --out bin src/tsi.ts"
-
   },
   "bin": {
     "tsi": "./bin/tsi"
