@@ -32,3 +32,21 @@ rebuild it though, just run
     > square('foo');
     error TS2081: Supplied parameters do not match any signature of call target.
     error TS2087: Could not select overload for 'call' expression.
+
+### Caveats
+
+You can't change the type of variable after it's been declared:
+
+    $ tsi
+    > var x = 5;
+    undefined
+    > x = 'hi';
+    error TS2011: Cannot convert 'string' to 'number'.
+
+You can't redeclare variables (in particular, to get around the previous caveat):
+
+    $ tsi
+    > var x = 1;
+    undefined
+    > var x = 'hi';
+    error TS2000: Duplicate identifier 'x'.
