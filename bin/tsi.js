@@ -14,39 +14,42 @@ var rl = readline.createInterface({
     output: process.stdout
 });
 
-var defaultPrompt = '>>> ', moreLinesPrompt = '... ', context = {}, verbose = argv.v, force = argv.f, sourceUnits = [], sourceNumber = 0;
+var defaultPrompt = '>>> ', moreLinesPrompt = '... ', declarations = [
+    __dirname + '/../node_modules/typescript.api/decl/ecma.d.ts',
+    __dirname + '/../node_modules/typescript.api/decl/node.d.ts'
+], defaultPrefix = '', context = {}, verbose = argv.v, force = argv.f;
 
-function repl(prompt, prefix) {
-    rl.question(prompt, function (code) {
-        var code = prefix + '\n' + code, openCurly = (code.match(/\{/g) || []).length, closeCurly = (code.match(/\}/g) || []).length, openParen = (code.match(/\(/g) || []).length, closeParen = (code.match(/\)/g) || []).length;
-        if (openCurly === closeCurly && openParen === closeParen) {
-            var newSourceUnits = sourceUnits.concat([
-                typescript.create(sourceNumber + '.ts', code)
-            ]);
-            typescript.compile(newSourceUnits, function (compiled) {
-                var current = compiled[newSourceUnits.length - 1];
-                if (verbose) {
-                    console.log(current.content);
-                }
-                for (var i = 0; i < current.diagnostics.length; i++) {
-                    console.log(current.diagnostics[i].message);
-                }
-                if (force || current.diagnostics.length === 0) {
-                    sourceNumber++;
-                    sourceUnits = newSourceUnits;
-                    try  {
-                        console.log(vm.runInNewContext(current.content, context));
-                    } catch (e) {
-                        console.log(e.stack);
+typescript.resolve(declarations, function (sourceUnits) {
+    function repl(prompt, prefix) {
+        rl.question(prompt, function (code) {
+            var code = prefix + '\n' + code, openCurly = (code.match(/\{/g) || []).length, closeCurly = (code.match(/\}/g) || []).length, openParen = (code.match(/\(/g) || []).length, closeParen = (code.match(/\)/g) || []).length;
+            if (openCurly === closeCurly && openParen === closeParen) {
+                var newSourceUnits = sourceUnits.concat([
+                    typescript.create(sourceUnits.length + '.ts', code)
+                ]);
+                typescript.compile(newSourceUnits, function (compiled) {
+                    var current = compiled[compiled.length - 1];
+                    if (verbose) {
+                        console.log(current.content);
                     }
-                }
-                repl(defaultPrompt, '');
-            });
-        } else {
-            repl(moreLinesPrompt, code);
-        }
-    });
-}
-
-repl(defaultPrompt, '');
+                    for (var i = 0; i < current.diagnostics.length; i++) {
+                        console.log(current.diagnostics[i].message);
+                    }
+                    if (force || current.diagnostics.length === 0) {
+                        sourceUnits = newSourceUnits;
+                        try  {
+                            console.log(vm.runInNewContext(current.content, context));
+                        } catch (e) {
+                            console.log(e.stack);
+                        }
+                    }
+                    repl(defaultPrompt, defaultPrefix);
+                });
+            } else {
+                repl(moreLinesPrompt, code);
+            }
+        });
+    }
+    repl(defaultPrompt, defaultPrefix);
+});
 
