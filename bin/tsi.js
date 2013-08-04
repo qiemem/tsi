@@ -20,10 +20,11 @@ function repl(prompt, prefix) {
     rl.question(prompt, function (code) {
         var code = prefix + '\n' + code, openCurly = (code.match(/\{/g) || []).length, closeCurly = (code.match(/\}/g) || []).length, openParen = (code.match(/\(/g) || []).length, closeParen = (code.match(/\)/g) || []).length;
         if (openCurly === closeCurly && openParen === closeParen) {
-            sourceNumber++;
-            sourceUnits.push(typescript.create(sourceNumber + '.ts', code));
-            typescript.compile(sourceUnits, function (compiled) {
-                var current = compiled[sourceUnits.length - 1];
+            var newSourceUnits = sourceUnits.concat([
+                typescript.create(sourceNumber + '.ts', code)
+            ]);
+            typescript.compile(newSourceUnits, function (compiled) {
+                var current = compiled[newSourceUnits.length - 1];
                 if (verbose) {
                     console.log(current.content);
                 }
@@ -31,6 +32,8 @@ function repl(prompt, prefix) {
                     console.log(current.diagnostics[i].message);
                 }
                 if (force || current.diagnostics.length === 0) {
+                    sourceNumber++;
+                    sourceUnits = newSourceUnits;
                     try  {
                         console.log(vm.runInNewContext(current.content, context));
                     } catch (e) {
