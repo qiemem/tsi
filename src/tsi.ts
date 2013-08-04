@@ -3,6 +3,7 @@
 import readline = module("readline");
 import vm = module("vm");
 
+var Console = require('console').Console;
 var typescript = require("typescript.api");
 var options = require('optimist')
     .usage('A simple typescript REPL.\nUsage: $0')
@@ -25,6 +26,18 @@ var rl = readline.createInterface({
   output: process.stdout
 });
 
+function createContext() {
+  var context;
+  context = vm.createContext();
+  for (var g in global) context[g] = global[g];
+  context.console = new Console(process.stdout);
+  context.global = context;
+  context.global.global = context;
+  context.module = module;
+  context.require = require;
+  return context;
+}
+
 var defaultPrompt = '> ',
 	moreLinesPrompt = '  ',
     declarations = [
@@ -32,7 +45,7 @@ var defaultPrompt = '> ',
       __dirname+'/../node_modules/typescript.api/decl/node.d.ts'
     ],
     defaultPrefix = '',
-    context = {},
+    context = createContext(),
     verbose = argv.v,
     force = argv.f;
 
@@ -59,7 +72,7 @@ typescript.resolve(declarations, function (sourceUnits) {
           if (force || current.diagnostics.length === 0) {
             sourceUnits = newSourceUnits;
             try {
-              console.log(vm.runInNewContext(current.content, context));
+              console.log(vm.runInContext(current.content, context));
             } catch (e) {
               console.log(e.stack);
             }
