@@ -3,6 +3,7 @@ var util = require('util');
 var vm = require('vm');
 
 var Console = require('console').Console;
+var builtinLibs = require('repl')._builtinLibs;
 var typescript = require("typescript.api");
 var options = require('optimist').usage('A simple typescript REPL.\nUsage: $0').alias('h', 'help').describe('h', 'Print this help message').alias('f', 'force').describe('f', 'Force tsi to evaluate code with typescript errors.').alias('v', 'verbose').describe('v', 'Print compiled javascript before evaluating.'), argv = options.argv;
 
@@ -26,6 +27,22 @@ function createContext() {
     context.global.global = context;
     context.module = module;
     context.require = require;
+
+    builtinLibs.forEach(function (name) {
+        Object.defineProperty(context, name, {
+            get: function () {
+                var lib = require(name);
+                context[name] = lib;
+                return lib;
+            },
+            set: function (val) {
+                delete context[name];
+                context[name] = val;
+            },
+            configurable: true
+        });
+    });
+
     return context;
 }
 

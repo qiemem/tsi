@@ -5,6 +5,7 @@ import util = module('util');
 import vm = module('vm');
 
 var Console = require('console').Console;
+var builtinLibs = require('repl')._builtinLibs;
 var typescript = require("typescript.api");
 var options = require('optimist')
     .usage('A simple typescript REPL.\nUsage: $0')
@@ -27,6 +28,7 @@ var rl = readline.createInterface({
   output: process.stdout
 });
 
+// Much of this function is from repl.REPLServer.createContext
 function createContext() {
   var context;
   context = vm.createContext();
@@ -36,6 +38,24 @@ function createContext() {
   context.global.global = context;
   context.module = module;
   context.require = require;
+
+  // Lazy load modules on use
+  builtinLibs.forEach( (name) => {
+    Object.defineProperty(context, name, {
+      get: function() {
+        var lib = require(name);
+        context[name] = lib;
+        return lib;
+      },
+      // Allow creation of globals of the same name
+      set: function (val) {
+        delete context[name];
+        context[name] = val;
+      },
+      configurable: true
+    });
+  });
+
   return context;
 }
 
