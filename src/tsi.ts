@@ -25,8 +25,8 @@ var rl = readline.createInterface({
   output: process.stdout
 });
 
-var defaultPrompt = '>>> ',
-	moreLinesPrompt = '... ',
+var defaultPrompt = '> ',
+	moreLinesPrompt = '  ',
     declarations = [
       __dirname+'/../node_modules/typescript.api/decl/ecma.d.ts',
       __dirname+'/../node_modules/typescript.api/decl/node.d.ts'
@@ -67,7 +67,12 @@ typescript.resolve(declarations, function (sourceUnits) {
           repl(defaultPrompt, defaultPrefix);
         });
       } else {
-        repl(moreLinesPrompt, code);
+        var indentLevel = openCurly - closeCurly + openParen - closeParen;
+        var nextPrompt = '';
+        for (var i=0; i<indentLevel; i++) {
+          nextPrompt += moreLinesPrompt;
+        }
+        repl(nextPrompt, code);
       }
     });
   }
