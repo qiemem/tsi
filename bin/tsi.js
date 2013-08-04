@@ -1,5 +1,6 @@
-var readline = require("readline");
-var vm = require("vm");
+var readline = require('readline');
+var util = require('util');
+var vm = require('vm');
 
 var Console = require('console').Console;
 var typescript = require("typescript.api");
@@ -52,7 +53,8 @@ typescript.resolve(declarations, function (sourceUnits) {
                     if (force || current.diagnostics.length === 0) {
                         sourceUnits = newSourceUnits;
                         try  {
-                            console.log(vm.runInContext(current.content, context));
+                            var result = vm.runInContext(current.content, context);
+                            console.log(util.inspect(result, false, 2, true));
                         } catch (e) {
                             console.log(e.stack);
                         }

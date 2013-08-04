@@ -1,7 +1,8 @@
 /// <reference path="../lib/node.d.ts" />
 
-import readline = module("readline");
-import vm = module("vm");
+import readline = module('readline');
+import util = module('util');
+import vm = module('vm');
 
 var Console = require('console').Console;
 var typescript = require("typescript.api");
@@ -72,7 +73,8 @@ typescript.resolve(declarations, function (sourceUnits) {
           if (force || current.diagnostics.length === 0) {
             sourceUnits = newSourceUnits;
             try {
-              console.log(vm.runInContext(current.content, context));
+              var result = vm.runInContext(current.content, context);
+              console.log(util.inspect(result, false, 2, true));
             } catch (e) {
               console.log(e.stack);
             }
