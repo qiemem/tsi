@@ -1,8 +1,8 @@
 /// <reference path="../lib/node.d.ts" />
 
-import readline = module('readline');
-import util = module('util');
-import vm = module('vm');
+import readline = require('readline');
+import util = require('util');
+import vm = require('vm');
 
 var Console = require('console').Console;
 var builtinLibs = require('repl')._builtinLibs;

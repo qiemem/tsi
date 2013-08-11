@@ -1,3 +1,4 @@
+/// <reference path="../lib/node.d.ts" />
 var readline = require('readline');
 var util = require('util');
 var vm = require('vm');
@@ -17,6 +18,7 @@ var rl = readline.createInterface({
     output: process.stdout
 });
 
+// Much of this function is from repl.REPLServer.createContext
 function createContext() {
     var context;
     context = vm.createContext();
@@ -28,6 +30,7 @@ function createContext() {
     context.module = module;
     context.require = require;
 
+    // Lazy load modules on use
     builtinLibs.forEach(function (name) {
         Object.defineProperty(context, name, {
             get: function () {
@@ -35,6 +38,7 @@ function createContext() {
                 context[name] = lib;
                 return lib;
             },
+            // Allow creation of globals of the same name
             set: function (val) {
                 delete context[name];
                 context[name] = val;
