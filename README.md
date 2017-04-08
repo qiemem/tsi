@@ -1,3 +1,5 @@
+It should be pretty clear that I no longer maintain this repository. If anybody would like to take it over, I would be more than happy to transfer ownership. Alternatively, if someone simply wants to use the name `tsi`, feel free, and I can even delete this repository to avoid confusion (as I doubt the code here is of much value).
+
 tsi
 ---
 
